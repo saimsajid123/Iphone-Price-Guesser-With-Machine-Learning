@@ -1,17 +1,38 @@
+import tkinter as tk
+from tkinter import ttk
 import pandas as pd
-
 from sklearn.linear_model import LinearRegression
 
-data = pd.read_csv("priceguesserofiphone.csv")
 
-model = LinearRegression()
+class PriceGuesser:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.entry1 = tk.Entry(self.root)
+        self.entry1.pack()
+        self.button1 = tk.Button(self.root, text="Predict Price", command=self.predict_price)
+        self.button1.pack()
 
-model.fit(data[["version"]], data[["price"]])
+        self.data = pd.read_csv("pricegusserofiphone.csv")
 
-latest_version = data["version"].max()
+        self.model = LinearRegression()
+        self.model.fit(self.data[["version"]], self.data["price"])
 
-model_to_predict = int(input("Enter the number of the model you want to predict: "))
+        self.label_result = tk.Label(self.root, text="")
+        self.label_result.pack()
 
-predicted_price = model.predict([[model_to_predict]])
+        self.root.mainloop()
 
-print(f"Predicted price for iPhone {model_to_predict}: {predicted_price}")
+    def predict_price(self):
+        try:
+            model_to_predict = float(self.entry1.get())
+            predicted_price = self.model.predict([[model_to_predict]])
+            predicted_price = predicted_price[0]
+
+            result_text = f"Predicted price for iPhone {model_to_predict}: {predicted_price:.2f}"
+        except ValueError:
+            result_text = "Please enter a valid numeric value."
+
+        self.label_result.config(text=result_text)
+
+
+app = PriceGuesser()
